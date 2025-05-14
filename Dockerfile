@@ -13,7 +13,7 @@ ENV PATH $CATALINA_HOME/bin:$PATH
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl -O https://downloads.apache.org/tomcat/tomcat-10/v10.1.40/bin/apache-tomcat-10.1.40.tar.gz && \
+    curl -O https://archive.apache.org/dist/tomcat/tomcat-10/v10.1.40/bin/apache-tomcat-10.1.40.tar.gz && \
     tar xzf apache-tomcat-10.1.40.tar.gz && \
     mv apache-tomcat-10.1.40 $CATALINA_HOME && \
     rm apache-tomcat-10.1.40.tar.gz
