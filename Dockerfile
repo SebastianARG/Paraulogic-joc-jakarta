@@ -1,19 +1,35 @@
-# Use official Tomcat 10.1.40 image with JDK 17
-FROM tomcat:10.1.40-jdk17
+# Etapa 1: Construcción del WAR con Maven y Java 21
+FROM maven:3.9.6-eclipse-temurin-21 as build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Remove default ROOT app (optional, to avoid conflicts)
-RUN rm -rf /usr/local/tomcat/webapps/ROOT
+# Etapa 2: Ejecución en Tomcat con Java 21
+FROM eclipse-temurin:21-jdk
 
-# Copy your WAR file to the webapps folder and name it ROOT.war
-# So your app is served at the root URL (/)
-COPY target/*.war /usr/local/tomcat/webapps/ROOT.war
+# Instala Tomcat 10.1.40 manualmente (ya que no hay imagen oficial con Temurin 21 aún)
+ENV CATALINA_HOME /usr/local/tomcat
+ENV PATH $CATALINA_HOME/bin:$PATH
 
-# Expose the default port Render expects (dynamic, Render sets $PORT)
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -O https://downloads.apache.org/tomcat/tomcat-10/v10.1.40/bin/apache-tomcat-10.1.40.tar.gz && \
+    tar xzf apache-tomcat-10.1.40.tar.gz && \
+    mv apache-tomcat-10.1.40 $CATALINA_HOME && \
+    rm apache-tomcat-10.1.40.tar.gz
+
+# Borra la app ROOT por defecto
+RUN rm -rf $CATALINA_HOME/webapps/ROOT
+
+# Copia el WAR generado desde la etapa de build
+COPY --from=build /app/target/*.war $CATALINA_HOME/webapps/ROOT.war
+
+# Render utiliza un puerto dinámico ($PORT)
 ENV PORT=8080
 EXPOSE $PORT
 
-# Replace port 8080 with the environment variable $PORT (Render requirement)
-RUN sed -i "s/port=\"8080\"/port=\"${PORT}\"/" /usr/local/tomcat/conf/server.xml
+# Sustituye 8080 por $PORT en server.xml
+RUN sed -i "s/port=\"8080\"/port=\"${PORT}\"/" $CATALINA_HOME/conf/server.xml
 
-# Start Tomcat
+# Inicia Tomcat
 CMD ["catalina.sh", "run"]
