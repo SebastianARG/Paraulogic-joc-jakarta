@@ -1,0 +1,379 @@
+/* === RESET BÁSICO === */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    color: #333333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+* {
+    box-sizing: inherit;
+    
+}
+
+main {
+    flex: 1;
+}
+
+
+
+/* === HEADER === */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    height: 30px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.menu {
+    display: flex;
+    gap: 25px;
+}
+
+.menu a {
+    text-decoration: none;
+    font-weight: 500;
+    color: #2c3e50;
+    transition: color 0.3s ease;
+}
+
+.menu a:hover {
+    color: #0077cc;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.actions i {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    cursor: pointer;
+}
+
+/* === FOOTER === */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    back ground-color: #f5f5f5;
+    color: #333;
+    font-size: 0.9rem;
+    border-top: 1px solid #ddd;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.footer a {
+    text-decoration: none;
+    color: #333;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #007BFF;
+}
+
+.footer-center span {
+    margin: 0 0.5rem;
+    color: #aaa;
+}
+
+.footer-right i {
+    font-size: 1.2rem;
+}
+
+/* === GAME LAYOUT === */
+.game-layout {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 2rem;
+}
+
+.hexagon-struct {
+    flex: 1;
+}
+
+.right-panel {
+    flex: 0 0 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* === HEXAGONOS === */
+.hexagon-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+}
+
+.hex-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.hex {
+    width: 100px;
+    height: 115px;
+    background-color: transparent;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    -webkit-clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    border: 2px solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000;
+    transition: transform 0.2s ease;
+}
+
+.hex:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+/* === PANEL DE PALABRAS ACERTADAS === */
+.found-words-panel {
+    border: 2px solid black;
+    padding: 1rem;
+    border-radius: 1.2rem;
+    background-color: white;
+}
+
+.found-words-panel .search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    padding: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.found-words-panel input {
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+.found-words-panel .found-list {
+    background-color: #f7f3fc;
+    margin-top: 1rem;
+    border-radius: 10px;
+    padding: 0.6rem;
+    list-style: none;
+}
+
+.found-words-panel .found-list li {
+    padding: 0.3rem 0;
+}
+
+/* === PANEL DEL TEMPORIZADOR === */
+.timer-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f7f3fc;
+    padding: 1rem;
+    border-radius: 1.2rem;
+    width: fit-content;
+    margin: auto;
+}
+
+.timer-panel .timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #5f44b2;
+}
+
+.timer-panel .labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    font-size: 0.9rem;
+    color: #444;
+    margin-top: 0.3rem;
+}
+
+/* === PANEL DE INPUT === */
+.word-input-panel {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.word-input-panel input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.word-input-panel .submit-button {
+    background-color: #5f44b2;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* === SCORE PAGE === */
+.score-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f8f9fb;
+}
+
+.score-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.score-back {
+    margin-bottom: 2rem;
+    text-align: left;
+    width: 100%;
+    max-width: 600px;
+}
+
+.score-back a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.score-back a:hover {
+    color: #5f44b2;
+}
+
+.score-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.score-list li {
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.score-bonus {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #444;
+    text-align: center;
+}
+
+/* === STATS PANEL STYLES === */
+.score-wrapper {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #f8f9fb;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.score-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #222;
+}
+
+.score-back {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.score-back a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.score-back a:hover {
+    color: #5f44b2;
+}
+
+.score-wrapper p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    color: #444;
+}
+
+.score-wrapper h2 {
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.score-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.score-list li {
+    padding: 0.4rem 0;
+    font-size: 1.1rem;
+    color: #333;
+}
