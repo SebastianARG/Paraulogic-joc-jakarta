@@ -33,6 +33,10 @@ public class WordDAO {
         return words;
     }
 
+    public boolean exists(String word) {
+        return isValid(word);
+    }
+
     public boolean isValid(String text) {
         String sql = "SELECT COUNT(*) FROM dictionary WHERE text = ?";
 

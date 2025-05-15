@@ -8,10 +8,13 @@
 <%@ include file="../init.jsp" %>
 
 <header class="header">
-    <div class="logo">
-        <img src="${pageContext.request.contextPath}/assets/imgs/iesferreria.png" alt="Logo" />
-        <span class="logo-text">Paraulogic</span>
-    </div>
+	
+	<div class="logo">
+	    <a href="https://agora.xtec.cat/ieslaferreria/" target="_blank">
+	        <img src="${pageContext.request.contextPath}/assets/imgs/iesferreria.png" alt="Logo" />
+	    </a>
+	    <span class="logo-text">Paraulogic</span>
+	</div>
 
     <nav class="menu">
         <a href="${pageContext.request.contextPath}/HomeServlet">${game}</a>
