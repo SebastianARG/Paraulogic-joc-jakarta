@@ -6,7 +6,7 @@
 <%@ include file="init.jsp" %>
 
 <div class="game-layout">
-    <!-- Panel de hexágonos -->
+    <!-- Panel de hexagonos -->
     <div class="hexagon-struct">
         <%@ include file="game-panels/hexagon-struct.jsp" %>
     </div>

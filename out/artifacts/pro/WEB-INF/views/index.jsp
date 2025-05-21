@@ -15,8 +15,7 @@
     
     <%--Game panel --%>
     <c:import url="/GameServlet" />
-    
-    
+
     <%--Footer --%>
     <%@include file="header-footer/footer.jsp" %>
 </body>

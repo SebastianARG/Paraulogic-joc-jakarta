@@ -19,6 +19,7 @@ public class HomeServlet extends HttpServlet {
         String lang = (String) request.getSession().getAttribute("lang");
         Locale locale = lang != null ? new Locale(lang) : request.getLocale();
 
+
         String title = LanguageConfig.get(locale, "title");
         request.setAttribute("title", title);
         request.setAttribute("game", LanguageConfig.get(locale, "game"));

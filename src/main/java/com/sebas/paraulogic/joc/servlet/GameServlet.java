@@ -16,72 +16,99 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@WebServlet(name = "GameServlet", urlPatterns = {"/game"})
+@WebServlet(name = "GameServlet", urlPatterns={"game"})
 public class GameServlet extends HttpServlet {
+	private final Logger _log = LoggerFactory.getLogger(GameServlet.class);
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+	    _log.info("inicio del doGet");
 
-        String lang = (String) request.getSession().getAttribute("lang");
-        Locale locale = lang != null ? new Locale(lang) : request.getLocale();
+	    String lang = (String) request.getSession().getAttribute("lang");
+	    Locale locale = lang != null ? new Locale(lang) : request.getLocale();
 
-        // Generar letras válidas y guardarlas en la base de datos
-        List<Character> letras = LetterGenerator.generateValidLetters();
-        DAOFactory.getLetterDAO().saveLetters(letras);
+	    String partial = request.getParameter("partial");
+	    if ("founds".equals(partial)) {
+	        // Render solo el panel de palabras encontradas
+	        List<String> foundWords = (List<String>) request.getSession().getAttribute("foundWords");
+	        if (foundWords == null) foundWords = new ArrayList<>();
 
-        // Texto traducido
-        request.setAttribute("scoreText", LanguageConfig.get(locale, "score"));
-        request.setAttribute("foundWordsTitle", LanguageConfig.get(locale, "foundWords"));
-        request.setAttribute("foundWordsPlaceholder", LanguageConfig.get(locale, "foundWords.placeholder"));
-        request.setAttribute("wordInputPlaceholder", LanguageConfig.get(locale, "wordInput.placeholder"));
-        request.setAttribute("wordInputButton", LanguageConfig.get(locale, "wordInput.button"));
-        request.setAttribute("startText", LanguageConfig.get(locale, "start"));
-        request.setAttribute("displayContext", DisplayContext.class);
+	        int score = request.getSession().getAttribute("score") != null
+	                ? (int) request.getSession().getAttribute("score") : 0;
 
-        // Letras organizadas en 3 filas para el frontend
-        request.setAttribute("fila1", List.of(letras.get(0)));
-        request.setAttribute("fila2", letras.subList(1, 4));
-        request.setAttribute("fila3", letras.subList(4, 7));
+	        request.setAttribute("foundWords", foundWords);
+	        request.setAttribute("score", score);
+	        request.setAttribute("scoreText", LanguageConfig.get(locale, "score"));
+	        request.setAttribute("foundWordsTitle", LanguageConfig.get(locale, "foundWords"));
+	        request.setAttribute("foundWordsPlaceholder", LanguageConfig.get(locale, "foundWords.placeholder"));
 
-        List<String> foundWords = (List<String>) request.getSession().getAttribute("foundWords");
-        if (foundWords == null) foundWords = new ArrayList<>();
+	        request.getRequestDispatcher("/WEB-INF/views/game-panels/found-words-panel.jsp").forward(request, response);
+	        return;
+	    }
 
-        int score = request.getSession().getAttribute("score") != null
-                ? (int) request.getSession().getAttribute("score") : 0;
+	    // Renderizado completo
+	    if (request.getSession().getAttribute("new") == null) {
 
-        request.setAttribute("foundWords", foundWords);
-        request.setAttribute("score", score);
+	        // Generar letras válidas y guardarlas en la base de datos
+	        List<Character> letras = LetterGenerator.generateValidLetters();
+	        DAOFactory.getLetterDAO().saveLetters(letras);
 
-        request.getRequestDispatcher("/WEB-INF/views/game.jsp").forward(request, response);
-    }
+	        // Traducciones
+	        request.setAttribute("scoreText", LanguageConfig.get(locale, "score"));
+	        request.setAttribute("foundWordsTitle", LanguageConfig.get(locale, "foundWords"));
+	        request.setAttribute("foundWordsPlaceholder", LanguageConfig.get(locale, "foundWords.placeholder"));
+	        request.setAttribute("wordInputPlaceholder", LanguageConfig.get(locale, "wordInput.placeholder"));
+	        request.setAttribute("wordInputButton", LanguageConfig.get(locale, "wordInput.button"));
+	        request.setAttribute("startText", LanguageConfig.get(locale, "start"));
+	        request.setAttribute("displayContext", DisplayContext.class);
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	        // Letras organizadas
+	        request.setAttribute("fila1", List.of(letras.get(0)));
+	        request.setAttribute("fila2", letras.subList(1, 4));
+	        request.setAttribute("fila3", letras.subList(4, 7));
 
-        HttpSession session = request.getSession();
-        String palabra = request.getParameter("palabra").toLowerCase();
+	        List<String> foundWords = (List<String>) request.getSession().getAttribute("foundWords");
+	        if (foundWords == null) foundWords = new ArrayList<>();
 
-        List<String> acertadas = (List<String>) session.getAttribute("foundWords");
-        if (acertadas == null) acertadas = new ArrayList<>();
+	        int score = request.getSession().getAttribute("score") != null
+	                ? (int) request.getSession().getAttribute("score") : 0;
 
-        int puntuacion = session.getAttribute("score") != null
-                ? (int) session.getAttribute("score") : 0;
+	        request.setAttribute("foundWords", foundWords);
+	        request.setAttribute("score", score);
+	        _log.info("Final del doGet");
 
-        if (DAOFactory.getWordDAO().exists(palabra)) {
-            if (!acertadas.contains(palabra)) {
-                acertadas.add(palabra);
-                puntuacion += calcularPuntos(palabra);
-            }
-        }
+	        request.getRequestDispatcher("/WEB-INF/views/game.jsp").forward(request, response);
+	    }
+	}
 
-        session.setAttribute("foundWords", acertadas);
-        session.setAttribute("score", puntuacion);
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+		HttpSession session = request.getSession();
+		String palabra = request.getParameter("palabra").toLowerCase();
 
-        response.sendRedirect("game");
-    }
+		List<String> acertadas = (List<String>) session.getAttribute("foundWords");
+		if (acertadas == null) acertadas = new ArrayList<>();
+
+		int puntuacion = session.getAttribute("score") != null
+				? (int) session.getAttribute("score") : 0;
+
+		if (DAOFactory.getWordDAO().exists(palabra)) {
+			if (!acertadas.contains(palabra)) {
+				acertadas.add(palabra);
+				puntuacion += calcularPuntos(palabra);
+			}
+		}
+
+		session.setAttribute("foundWords", acertadas);
+		session.setAttribute("score", puntuacion);
+
+		response.sendRedirect("HomeServlet"); // Redirige para recargar todo el juego
+	}
 
     private int calcularPuntos(String palabra) {
         int len = palabra.length();
@@ -95,8 +122,4 @@ public class GameServlet extends HttpServlet {
         }
     }
 
-    @Override
-    public String getServletInfo() {
-        return "Servlet que prepara y muestra el juego";
-    }
 }

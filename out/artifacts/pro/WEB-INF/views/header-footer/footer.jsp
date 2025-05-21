@@ -10,8 +10,8 @@
     </div>
 
     <div class="footer-right">
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-github"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
+        <a href="https://x.com/LaFerreria" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://github.com/SebastianARG" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/sebastian-alejandro-rengifo-gil-51bb1a267/" target="_blank"><i class="fab fa-linkedin"></i></a>
     </div>
 </footer>
