@@ -17,7 +17,7 @@
 	</div>
 
     <nav class="menu">
-        <a href="${pageContext.request.contextPath}/HomeServlet">${game}</a>
+        <a href="${pageContext.request.contextPath}/HomeServlet?reset=true">${game}</a>
         <a href="#">${hits}</a>
         <a href="#">${modes}</a>
         <a href="${pageContext.request.contextPath}/RulesServlet">${rules}</a>

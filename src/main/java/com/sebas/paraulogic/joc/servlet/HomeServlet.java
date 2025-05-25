@@ -17,7 +17,11 @@ public class HomeServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String lang = (String) request.getSession().getAttribute("lang");
-        Locale locale = lang != null ? new Locale(lang) : request.getLocale();
+        if (lang == null) {
+            lang = "es";
+            request.getSession().setAttribute("lang", lang);
+        }
+        Locale locale = new Locale(lang);
 
 
         String title = LanguageConfig.get(locale, "title");

@@ -25,69 +25,64 @@ public class GameServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-	        throws ServletException, IOException {
-	    _log.info("inicio del doGet");
+			throws ServletException, IOException {
+		_log.info("inicio del doGet");
 
-	    String lang = (String) request.getSession().getAttribute("lang");
-	    Locale locale = lang != null ? new Locale(lang) : request.getLocale();
+		HttpSession session = request.getSession();
+		String lang = (String) session.getAttribute("lang");
+		if (lang == null) {
+			lang = "es"; // Idioma por defecto
+			session.setAttribute("lang", lang);
+		}
+		Locale locale = new Locale(lang);
 
-	    String partial = request.getParameter("partial");
-	    if ("founds".equals(partial)) {
-	        // Render solo el panel de palabras encontradas
-	        List<String> foundWords = (List<String>) request.getSession().getAttribute("foundWords");
-	        if (foundWords == null) foundWords = new ArrayList<>();
+		// Si se solicita reset (nueva partida)
+		if ("true".equals(request.getParameter("reset"))) {
+			session.removeAttribute("foundWords");
+			session.removeAttribute("score");
+			session.removeAttribute("new");
+			session.removeAttribute("letras");
+		}
 
-	        int score = request.getSession().getAttribute("score") != null
-	                ? (int) request.getSession().getAttribute("score") : 0;
+// Si es una partida nueva o se reinició
+		if (session.getAttribute("new") == null) {
+			List<Character> letras = LetterGenerator.generateValidLetters();
+			session.setAttribute("letras", letras);
+			session.setAttribute("new", "no");
+		}
 
-	        request.setAttribute("foundWords", foundWords);
-	        request.setAttribute("score", score);
-	        request.setAttribute("scoreText", LanguageConfig.get(locale, "score"));
-	        request.setAttribute("foundWordsTitle", LanguageConfig.get(locale, "foundWords"));
-	        request.setAttribute("foundWordsPlaceholder", LanguageConfig.get(locale, "foundWords.placeholder"));
+		List<Character> letras = (List<Character>) session.getAttribute("letras");
+		if (letras != null && letras.size() >= 7) {
+			request.setAttribute("fila1", List.of(letras.get(0)));
+			request.setAttribute("fila2", letras.subList(1, 4));
+			request.setAttribute("fila3", letras.subList(4, 7));
+		}
 
-	        request.getRequestDispatcher("/WEB-INF/views/game-panels/found-words-panel.jsp").forward(request, response);
-	        return;
-	    }
+		// Traducciones
+		request.setAttribute("scoreText", LanguageConfig.get(locale, "score"));
+		request.setAttribute("foundWordsTitle", LanguageConfig.get(locale, "foundWords"));
+		request.setAttribute("foundWordsPlaceholder", LanguageConfig.get(locale, "foundWords.placeholder"));
+		request.setAttribute("wordInputPlaceholder", LanguageConfig.get(locale, "wordInput.placeholder"));
+		request.setAttribute("wordInputButton", LanguageConfig.get(locale, "wordInput.button"));
+		request.setAttribute("startText", LanguageConfig.get(locale, "start"));
+		request.setAttribute("displayContext", DisplayContext.class);
 
-	    // Renderizado completo
-	    if (request.getSession().getAttribute("new") == null) {
+		// Estado actual del juego
+		List<String> foundWords = (List<String>) session.getAttribute("foundWords");
+		if (foundWords == null) foundWords = new ArrayList<>();
+		int score = session.getAttribute("score") != null ? (int) session.getAttribute("score") : 0;
 
-	        // Generar letras válidas y guardarlas en la base de datos
-	        List<Character> letras = LetterGenerator.generateValidLetters();
-	        DAOFactory.getLetterDAO().saveLetters(letras);
+		request.setAttribute("foundWords", foundWords);
+		request.setAttribute("score", score);
 
-	        // Traducciones
-	        request.setAttribute("scoreText", LanguageConfig.get(locale, "score"));
-	        request.setAttribute("foundWordsTitle", LanguageConfig.get(locale, "foundWords"));
-	        request.setAttribute("foundWordsPlaceholder", LanguageConfig.get(locale, "foundWords.placeholder"));
-	        request.setAttribute("wordInputPlaceholder", LanguageConfig.get(locale, "wordInput.placeholder"));
-	        request.setAttribute("wordInputButton", LanguageConfig.get(locale, "wordInput.button"));
-	        request.setAttribute("startText", LanguageConfig.get(locale, "start"));
-	        request.setAttribute("displayContext", DisplayContext.class);
-
-	        // Letras organizadas
-	        request.setAttribute("fila1", List.of(letras.get(0)));
-	        request.setAttribute("fila2", letras.subList(1, 4));
-	        request.setAttribute("fila3", letras.subList(4, 7));
-
-	        List<String> foundWords = (List<String>) request.getSession().getAttribute("foundWords");
-	        if (foundWords == null) foundWords = new ArrayList<>();
-
-	        int score = request.getSession().getAttribute("score") != null
-	                ? (int) request.getSession().getAttribute("score") : 0;
-
-	        request.setAttribute("foundWords", foundWords);
-	        request.setAttribute("score", score);
-	        _log.info("Final del doGet");
-
-	        request.getRequestDispatcher("/WEB-INF/views/game.jsp").forward(request, response);
-	    }
+		_log.info("Final del doGet");
+		request.getRequestDispatcher("/WEB-INF/views/game.jsp").forward(request, response);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+			throws ServletException, IOException {
+
 		HttpSession session = request.getSession();
 		String palabra = request.getParameter("palabra").toLowerCase();
 
@@ -106,8 +101,10 @@ public class GameServlet extends HttpServlet {
 
 		session.setAttribute("foundWords", acertadas);
 		session.setAttribute("score", puntuacion);
+		session.setAttribute("new", "no");
 
-		response.sendRedirect("HomeServlet"); // Redirige para recargar todo el juego
+		// 🔁 Redirige con GET para renderizar todo `game.jsp`
+		response.sendRedirect(request.getContextPath() + "/GameServlet");
 	}
 
     private int calcularPuntos(String palabra) {
